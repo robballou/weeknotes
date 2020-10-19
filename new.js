@@ -27,8 +27,37 @@ fs.writeFile(path.join(filepath, filename), data, { encoding: 'utf8', mode: 0664
         process.exit(1);
     }
 
-    process.exit(0);
+    updateIndex(filename, filepath, monday).then(() => {
+        process.exit(0);
+    }).catch((err) => {
+        console.error(err);
+        process.exit(1);
+    });
+
 });
+
+/**
+ * Updates the index file.
+ * @param {string} filename created filename
+ * @param {string} filepath folder
+ * @param {Date} monday Monday
+ */
+function updateIndex(filename, filepath, monday) {
+    return new Promise((resolve, reject) => {
+        const readme = path.join(filepath, 'README.md');
+        const newData = `\n* [${monday.toLocaleDateString()}](${filename})\n\n`;
+        fs.readFile(readme, 'utf8', (err, data) => {
+            if (err) { return reject(err) }
+
+            const writeData = `${data.trim()}${newData}`;
+
+            fs.writeFile(readme, writeData, { encoding: 'utf8' }, (err) => {
+                if (err) { reject(err) }
+                resolve();
+            });
+        });
+    });
+}
 
 function pad(number) {
     if (number < 10) {
