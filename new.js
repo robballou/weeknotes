@@ -12,7 +12,7 @@ while (monday.getDay() !== 1) {
     monday.setTime(monday.getTime() - 24*60*60);
 }
 
-let sunday = new Date(monday.getTime() + 24*60*60*6);
+let sunday = new Date(monday.getTime() + (24*60*60*6) * 1000);
 
 const filepath = `${monday.getFullYear()}`;
 const month = monday.getMonth() + 1;
