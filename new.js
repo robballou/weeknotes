@@ -19,7 +19,8 @@ const month = monday.getMonth() + 1;
 const day = monday.getDate();
 const filename = `${pad(month)}${pad(day)}.md`;
 const dateOptions = ['en-us', { month: 'long', day: 'numeric' }]
-const data = `# ${monday.toLocaleDateString(...dateOptions)} - ${sunday.toLocaleDateString(...dateOptions)}\n\n`;
+const sundayDateOptions = sunday.getFullYear() !== monday.getFullYear() ? ['en-us', { month: 'long', day: 'numeric', year: 'numeric'}]: dateOptions;
+const data = `# ${monday.toLocaleDateString(...dateOptions)} - ${sunday.toLocaleDateString(...sundayDateOptions)}\n\n`;
 
 fs.writeFile(path.join(filepath, filename), data, { encoding: 'utf8', mode: 0664, flag: 'wx' }, (err) => {
     if (err) {
