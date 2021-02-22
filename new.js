@@ -20,7 +20,7 @@ const day = monday.getDate();
 const filename = `${pad(month)}${pad(day)}.md`;
 const dateOptions = ['en-us', { month: 'long', day: 'numeric' }]
 const sundayDateOptions = sunday.getFullYear() !== monday.getFullYear() ? ['en-us', { month: 'long', day: 'numeric', year: 'numeric'}]: dateOptions;
-const data = `# ${monday.toLocaleDateString(...dateOptions)} - ${sunday.toLocaleDateString(...sundayDateOptions)}\n\n`;
+const data = `# ${monday.toLocaleDateString(...dateOptions)} - ${sunday.toLocaleDateString(...sundayDateOptions)}\n\n[« ]()\n\n`;
 
 fs.writeFile(path.join(filepath, filename), data, { encoding: 'utf8', mode: 0664, flag: 'wx' }, (err) => {
     if (err) {
@@ -46,13 +46,29 @@ fs.writeFile(path.join(filepath, filename), data, { encoding: 'utf8', mode: 0664
 function updateIndex(filename, filepath, monday) {
     return new Promise((resolve, reject) => {
         const readme = path.join(filepath, 'README.md');
-        const newData = `\n* [${monday.toLocaleDateString()}](${filename})\n\n`;
+        const options = {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+        }
+        const newData = `* [${monday.toLocaleDateString('en-US', options)}](${filename})`;
         fs.readFile(readme, 'utf8', (err, data) => {
             if (err) { return reject(err) }
 
-            const writeData = `${data.trim()}${newData}`;
+            const writeData = [];
+            let foundStartOfList = false;
+            data.split('\n').forEach((line) => {
+                if (!foundStartOfList && /^\* /.test(line)) {
+                    foundStartOfList = true;
+                    writeData.push(newData);
+                    writeData.push(line);
+                    return;
+                }
 
-            fs.writeFile(readme, writeData, { encoding: 'utf8' }, (err) => {
+                writeData.push(line);
+            });
+
+            fs.writeFile(readme, writeData.join('\n'), { encoding: 'utf8' }, (err) => {
                 if (err) { reject(err) }
                 resolve();
             });
